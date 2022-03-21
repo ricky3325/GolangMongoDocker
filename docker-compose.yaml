@@ -1,0 +1,37 @@
+version: "3.5"
+services:
+
+  nginx:
+    container_name: nginx
+    build: nginx/
+    ports:
+      - "80:80"
+    restart: on-failure
+    networks:
+      internal_routes:
+
+  myproject:
+    container_name: myproject
+    build: myproject/
+    restart: always
+    networks:
+      internal_routes:
+        aliases:
+          - myproject
+
+  mongodb_replicate_set_1:
+    container_name: rs1
+    image: mongo:4.2
+    command: mongod --port 27041 --dbpath /data/db --config /resource/mongod.yml
+    ports:
+      - "27017:27041" 
+    volumes:
+      - ./mongodb/mongod.yml:/resource/mongod.yml
+      - ./mongodb/data/rs1:/data/db
+    networks:
+      internal_routes:
+        aliases:
+          - rs1
+
+networks:
+  internal_routes:
